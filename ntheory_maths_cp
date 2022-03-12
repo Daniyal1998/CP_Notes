@@ -81,7 +81,7 @@ typedef long long int ll;
 
 	--> Fermat's Theorem - a^(m-1) ≡ 1 (mod m) if m is prime and a is co-prime to m and this property does not hold good for most composite number hence can be used to check prime when we take 1<a<(m-1). A generalized case of this theorem is Euler's theorem which states that a^Φ(m) ≡ 1 (mod m) if a and m are co-prime to each other and Φ is the Euler's totient function.
 
-		// will write later
+		// refer: https://www.geeksforgeeks.org/primality-test-set-2-fermet-method/
 
 2. Prime Factorization
 	--> O(sqrt(n) log(n))
@@ -215,3 +215,5 @@ Another definition is a.x ≡ 1 (mod m) find an x such that a.x mod m is 1 then 
 		 
 		    return gcd;
 		}
+
+4. 
