@@ -1,0 +1,217 @@
+Number Theory & Maths:
+
+#include<bits/stdc++.h>
+#define pb(a) emplace_back(a)
+#define mp(a,b) make_pair(a,b)
+#define MAX 1000005
+#define MOD 1000000007
+
+using namespace std;
+typedef long long int ll;
+
+1. Primality Test
+	--> O(sqrt(n)) - since divisors appears in pair so just iterating till root n is enough to check prime
+
+		bool prime_test(ll n)
+		{
+			for(ll i=2; i*i<=n; i++)
+			{
+				if(n%i==0)
+				return false;
+			}
+			return true;
+		}
+
+	--> Sieve of Eratosthenes - mark primes in a range
+
+		ll prime[MAX+1];
+		vector<ll> prime_arr;
+		void sieve()
+		{
+			for(ll i=2; i*i<=MAX; i++)
+			{
+				if(prime[i]==0)
+				{
+					for(ll j=i*i; j<=MAX; j+=i)
+					{
+						prime[j]=1;
+					}
+				}
+			}
+
+			for(ll i=2; i<=MAX; i++)
+			{
+				if(prime[i]==0)
+				prime_arr.pb(i);
+			}
+		}
+
+	--> Segmented Sieve - get primes in lower range and use it to further mark primes when l&r of range is high
+
+		ll prime[MAX+1];
+		vector<ll> prime_arr;
+		vector<ll> prime_arr_seg;
+
+		void seg_sieve(ll l, ll r)
+		{
+			sieve(); // call the sieve function to fetch all primes between 1 & MAX
+			bool isprime[r-l+1];
+
+			for(ll i=0; i<(r-l+1); i++)
+			isprime = true;
+
+			for(ll i=0; prime_arr[i]*prime_arr[i]<=r; i++)
+			{
+				ll base = (((l-1)/prime_arr[i])+1)*prime_arr[i]; // if l is divisible by prime_arr then we will get quotient-1 else quotient
+				for(ll j=base;j<=r;j+=prime_arr[i])
+				{
+					is_prime[j-l] = false;
+				}
+
+				if(base==prime_arr[i])
+				is_prime[base-l] = true; // suppose the range is [2,10] then 2 will me marked as false in 1st iteration 
+			}
+
+			for(ll i=0; i<(r-l+1); i++)
+			{
+				if(is_prime[i])
+				prime_arr_seg.pb(l+i);
+			}
+		}
+
+	--> Fermat's Theorem - a^(m-1) ≡ 1 (mod m) if m is prime and a is co-prime to m and this property does not hold good for most composite number hence can be used to check prime when we take 1<a<(m-1). A generalized case of this theorem is Euler's theorem which states that a^Φ(m) ≡ 1 (mod m) if a and m are co-prime to each other and Φ is the Euler's totient function.
+
+		// will write later
+
+2. Prime Factorization
+	--> O(sqrt(n) log(n))
+
+		vector<pair<ll,ll>> prime_fact_arr;
+		void prime_fact(ll n):
+		{
+			ll cnt=0;
+			while(n%2==0)
+			{
+				cnt += 1;
+				n /= 2;
+			}
+			prime_fact_arr.pb(mp(2,cnt));
+
+			for(ll i=3; i*i<=n; i+=2)
+			{
+				cnt=0;
+				while(n%i==0)
+				{
+					cnt += 1;
+					n /= i;
+				}
+				prime_fact_arr.pb(mp(i,cnt));
+
+				if(n==1)
+				break;
+			}
+
+			if(n!=1) // this case is when n itself is a prime number
+			prime_fact_arr.pb(mp(n,1));
+		}
+
+	--> Sieve method - store the lowest prime that divides the number and based on this we can get our prime factorization
+
+		ll prime[MAX+1];
+		vector<pair<ll,ll>> prime_fact_arr;
+		void prime_fact_sieve()
+		{
+			for(ll i=1; i<=MAX; i++)
+			prime[i] = i;
+
+			for(ll i=2; i*i<=MAX; i++)
+			{
+				if(prime[i]==i)
+				{
+					for(ll j=i*i; j<=MAX; j+=i)
+					{
+						if(prime[j]==j)
+						prime[j]=i;
+					}
+				}
+			}
+		}
+		void prime_fact(ll n)
+		{
+			prime_fact_sieve();
+			map<ll,ll> m;
+			while(n!=1)
+			{
+				m[prime[n]]++;
+				n /= prime[n];
+			}
+
+			for(auto i=m.begin(); i!=m.end() ; i++)
+			{
+				prime_fact_arr.pb(mp(i->first, i->second));
+			}
+		}
+
+3. Modular Arithmetic
+(a+b)%m = (a%m + b%m)%m
+(a*b)%m = (a%m * b*m)%m
+(a-b)%m = (a%m - b%m + m)%m // m is added as we might get a negetive result ex. (21-18)%10 = 3 or (21%10 - 18%10 + 10) = 3
+(a/b)%m = for this we need to learn multiplicative inverse using fermat's/ euler's formula
+
+a^Φ(m) ≡ 1 (mod m) where a&m are relatively prime
+a^Φ(m). a^-1 ≡ 1. a^-1 (mod m)
+a^(Φ(m)-1) ≡ a^-1 (mod m)
+if m is prime then Φ(m) = m-1 so
+a^(m-2) ≡ a^-1 (mod m) 
+
+so if we find a^(m-2) mod m then we will get multiplicative inverse of a
+
+Another definition is a.x ≡ 1 (mod m) find an x such that a.x mod m is 1 then x in the modulo inverse of a
+
+	--> Binary Exponentiation - finding powers of any number in log(n) ex. a^n mod m
+
+		ll modular_expo(ll a, ll n, ll mod)
+		{
+			ll ans=1;
+			a = a%mod;
+			while(n)
+			{
+				if(n&1)
+				ans = (ans*a)%mod;
+				a = (a*a)%mod;
+				n = n>>1;
+			}
+
+			return ans%mod;
+		}
+
+	--> Inverse Modulo (when mod is prime)
+
+		ll inverse_modulo(ll a, ll mod)
+		{
+			return modular_expo(a, mod-2, mod); // this will work if mod is prime and a & mod are relatively prime
+		}
+
+	--> Inverse Modulo (when mod is not prime but is co-prime to number) one can find the euler totient function and get it or use extended euclid's algo
+		source: https://www.geeksforgeeks.org/euclidean-algorithms-basic-and-extended/
+		x is inverse modulo of a wrt b and y is inverse modulo of b wrt a
+		ll gcdExtended(ll a, ll b, ll *x, ll *y)
+		{
+		    // Base Case
+		    if (a == 0)
+		    {
+		        *x = 0;
+		        *y = 1;
+		        return b;
+		    }
+		 
+		    ll x1, y1; // To store results of recursive call
+		    ll gcd = gcdExtended(b%a, a, &x1, &y1);
+		 
+		    // Update x and y using results of
+		    // recursive call
+		    *x = y1 - (b/a) * x1;
+		    *y = x1;
+		 
+		    return gcd;
+		}
