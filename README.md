@@ -1,2 +1,2 @@
 # CP_Notes
-My notes on CP
+My notes on CP (its work on progress)
